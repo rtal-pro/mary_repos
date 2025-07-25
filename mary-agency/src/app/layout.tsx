@@ -1,7 +1,22 @@
 import type { Metadata } from "next";
 import React from "react";
+import { Playfair_Display, Barlow_Condensed } from 'next/font/google'
 import { OrganizationStructuredData, LocalBusinessStructuredData, WebsiteStructuredData } from '@/components/seo/StructuredData'
 import "./globals.css";
+
+const playfairDisplay = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--font-display',
+  display: 'swap',
+})
+
+const barlowCondensed = Barlow_Condensed({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-condensed',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: {
@@ -88,13 +103,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>): React.JSX.Element {
   return (
-    <html lang="fr" className="scroll-smooth">
+    <html lang="fr" className={`scroll-smooth ${playfairDisplay.variable} ${barlowCondensed.variable}`}>
       <head>
         <OrganizationStructuredData />
         <LocalBusinessStructuredData />
         <WebsiteStructuredData />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="font-sans antialiased">
         {children}
