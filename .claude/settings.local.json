@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tailwindcss init:*)",
+      "Bash(npm run:*)",
+      "Bash(npm run lint)",
+      "Bash(docker-compose up:*)",
+      "Bash(rm:*)"
+    ],
+    "deny": []
+  }
+}
