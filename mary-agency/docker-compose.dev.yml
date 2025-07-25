@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      # Mount source code for hot reload
+      - .:/app
+      # Exclude node_modules from host
+      - /app/node_modules
+      # Exclude .next from host to prevent conflicts
+      - /app/.next
+    restart: unless-stopped
+    networks:
+      - mary-agency-dev-network
+    # Enable hot reload
+    stdin_open: true
+    tty: true
+
+  # Optional: Add Supabase local development
+  # supabase-dev:
+  #   image: supabase/postgres:15.1.0.117
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     POSTGRES_PASSWORD: your-super-secret-and-long-postgres-password
+  #     POSTGRES_DB: postgres
+  #   volumes:
+  #     - postgres_dev_data:/var/lib/postgresql/data
+  #   networks:
+  #     - mary-agency-dev-network
+
+networks:
+  mary-agency-dev-network:
+    driver: bridge
+
+# volumes:
+#   postgres_dev_data:

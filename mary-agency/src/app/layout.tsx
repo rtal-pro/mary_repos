@@ -1,13 +1,85 @@
 import type { Metadata } from "next";
 import React from "react";
+import { OrganizationStructuredData, LocalBusinessStructuredData, WebsiteStructuredData } from '@/components/seo/StructuredData'
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Mary Agency - Premium Communication Agency",
-  description: "Premium communication agency specializing in digital creation, film production, and web development. Luxury aesthetic meets exceptional results.",
-  keywords: ["communication agency", "digital creation", "film production", "web development", "luxury design"],
-  authors: [{ name: "Mary Agency" }],
-  viewport: "width=device-width, initial-scale=1",
+  title: {
+    default: 'Mary Agency - Authentic Digital Experiences | Premium Communication Agency Paris',
+    template: '%s | Mary Agency'
+  },
+  description: 'Leading communication agency in Paris specializing in digital creation, film production, and web development. Crafting authentic brand experiences since 2015. Contact us at 06 58 77 33 30.',
+  keywords: [
+    'communication agency', 
+    'digital creation', 
+    'film production', 
+    'web development', 
+    'Paris', 
+    'branding',
+    'luxury design',
+    'authentic experiences',
+    'creative agency',
+    'graphic design',
+    'marketing digital',
+    'agence communication Paris'
+  ],
+  authors: [{ name: 'Mary Agency', url: 'https://marybusinessgraphic.com' }],
+  creator: 'Mary Agency',
+  publisher: 'Mary Agency',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL('https://marybusinessgraphic.com'),
+  alternates: {
+    canonical: '/',
+    languages: {
+      'fr-FR': '/fr',
+      'en-US': '/en',
+    },
+  },
+  openGraph: {
+    title: 'Mary Agency - Authentic Digital Experiences',
+    description: 'Leading communication agency in Paris specializing in digital creation and authentic brand experiences. 231 Rue Saint-Honoré, 75001 Paris.',
+    url: 'https://marybusinessgraphic.com',
+    siteName: 'Mary Agency',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Mary Agency - Premium Communication Agency Paris',
+      },
+    ],
+    locale: 'fr_FR',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Mary Agency - Authentic Digital Experiences',
+    description: 'Leading communication agency in Paris specializing in digital creation and luxury branding.',
+    images: ['/twitter-image.jpg'],
+    creator: '@maryagency',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'your-google-verification-code',
+    // Add other verification codes as needed
+  },
+  category: 'business',
 };
 
 export default function RootLayout({
@@ -16,8 +88,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>): React.JSX.Element {
   return (
-    <html lang="fr">
-      <body className="font-sans">
+    <html lang="fr" className="scroll-smooth">
+      <head>
+        <OrganizationStructuredData />
+        <LocalBusinessStructuredData />
+        <WebsiteStructuredData />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
+      <body className="font-sans antialiased">
         {children}
       </body>
     </html>

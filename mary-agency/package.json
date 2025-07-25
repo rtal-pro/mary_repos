@@ -10,7 +10,13 @@
     "lint:fix": "next lint --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "docker:dev": "docker-compose -f docker-compose.dev.yml up --build",
+    "docker:dev:script": "./scripts/dev-docker.sh",
+    "docker:dev:down": "docker-compose -f docker-compose.dev.yml down",
+    "docker:prod": "docker-compose up --build",
+    "docker:prod:down": "docker-compose down",
+    "docker:clean": "docker system prune -a --volumes"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -22,7 +28,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
+    "autoprefixer": "^10.4.14",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -31,7 +37,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.4.4",
     "prettier": "^3.6.2",
-    "tailwindcss": "^4",
+    "tailwindcss": "^3.4.17",
     "typescript": "^5"
   }
 }

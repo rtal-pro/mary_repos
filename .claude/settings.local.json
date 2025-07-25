@@ -9,7 +9,12 @@
       "Bash(npm run:*)",
       "Bash(npm run lint)",
       "Bash(docker-compose up:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(chmod:*)",
+      "Bash(docker-compose:*)",
+      "Bash(curl:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker exec:*)"
     ],
     "deny": []
   }

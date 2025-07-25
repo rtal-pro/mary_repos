@@ -442,6 +442,143 @@ describe('SectionTitle', () => {
 })
 ```
 
+## Docker Development Rules
+
+### Development Environment
+
+**ALWAYS use Docker for development with hot reload:**
+
+```bash
+# Quick start development with hot reload
+npm run docker:dev
+
+# Or use the enhanced script
+npm run docker:dev:script
+
+# Stop development environment
+npm run docker:dev:down
+```
+
+### Docker Configuration Requirements
+
+```dockerfile
+# Dockerfile.dev - Development with hot reload
+FROM node:18-alpine
+WORKDIR /app
+
+# Install dependencies
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Environment variables for hot reload
+ENV NODE_ENV=development
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV WATCHPACK_POLLING=true
+ENV CHOKIDAR_USEPOLLING=true
+
+EXPOSE 3000
+CMD ["npm", "run", "dev", "--", "--hostname", "0.0.0.0"]
+```
+
+### Docker Compose Development
+
+```yaml
+# docker-compose.dev.yml
+services:
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app              # Mount source for hot reload
+      - /app/node_modules   # Exclude node_modules
+      - /app/.next          # Exclude .next cache
+    environment:
+      - NODE_ENV=development
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+```
+
+### Next.js Docker Configuration
+
+```typescript
+// next.config.ts - Docker-optimized
+const nextConfig: NextConfig = {
+  // Conditional output for production
+  ...(process.env.NODE_ENV === 'production' && { output: 'standalone' }),
+  
+  // Webpack hot reload for Docker
+  webpack: (config, { dev, isServer }) => {
+    if (dev && !isServer) {
+      config.watchOptions = {
+        poll: 1000,           // Check every second
+        aggregateTimeout: 300  // Wait 300ms after change
+      }
+    }
+    return config
+  }
+}
+```
+
+### Docker Scripts Requirements
+
+**Every project MUST have these scripts:**
+
+```json
+{
+  "scripts": {
+    "docker:dev": "docker-compose -f docker-compose.dev.yml up --build",
+    "docker:dev:down": "docker-compose -f docker-compose.dev.yml down",
+    "docker:prod": "docker-compose up --build",
+    "docker:prod:down": "docker-compose down",
+    "docker:clean": "docker system prune -a --volumes"
+  }
+}
+```
+
+### Hot Reload Troubleshooting
+
+**Common issues and solutions:**
+
+1. **Hot reload not working:**
+   ```bash
+   # Verify polling is enabled
+   docker exec -it container_name env | grep WATCH
+   
+   # Check file permissions
+   chmod -R 755 src/
+   ```
+
+2. **Performance issues:**
+   ```typescript
+   // Increase polling interval
+   config.watchOptions = {
+     poll: 2000,
+     aggregateTimeout: 500
+   }
+   ```
+
+3. **Port conflicts:**
+   ```yaml
+   # Change host port
+   ports:
+     - "3001:3000"
+   ```
+
+### Docker Best Practices
+
+- **Use .dockerignore** to exclude unnecessary files
+- **Multi-stage builds** for production optimization
+- **Volume mounting** for development hot reload
+- **Non-root user** for security
+- **Health checks** for monitoring
+- **Separate configs** for dev/prod environments
+
 ## Git Commit Convention
 
 ```bash
@@ -453,6 +590,404 @@ style(global): update typography scale for better readability
 refactor(portfolio): split PortfolioGrid into smaller components
 test(contact): add validation tests for contact form
 docs(readme): update setup instructions for Docker
+docker(dev): add hot reload support for development environment
+```
+
+## SEO Excellence Rules
+
+### 1. Meta Tags & Structured Data
+
+**Every page MUST have:**
+
+```typescript
+// app/layout.tsx or page.tsx
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Mary Agency - Authentic Digital Experiences | Premium Communication Agency',
+  description: 'Leading communication agency in Paris specializing in digital creation, film production, and web development. Crafting authentic brand experiences since 2015.',
+  keywords: ['communication agency', 'digital creation', 'film production', 'web development', 'Paris', 'branding'],
+  authors: [{ name: 'Mary Agency' }],
+  creator: 'Mary Agency',
+  publisher: 'Mary Agency',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL('https://marybusinessgraphic.com'),
+  alternates: {
+    canonical: '/',
+    languages: {
+      'fr-FR': '/fr',
+      'en-US': '/en',
+    },
+  },
+  openGraph: {
+    title: 'Mary Agency - Authentic Digital Experiences',
+    description: 'Leading communication agency specializing in digital creation and authentic brand experiences.',
+    url: 'https://marybusinessgraphic.com',
+    siteName: 'Mary Agency',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Mary Agency - Premium Communication Agency',
+      },
+    ],
+    locale: 'fr_FR',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Mary Agency - Authentic Digital Experiences',
+    description: 'Leading communication agency specializing in digital creation.',
+    images: ['/twitter-image.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+}
+```
+
+**Structured Data (JSON-LD):**
+
+```typescript
+// components/seo/StructuredData.tsx
+export function OrganizationStructuredData(): React.JSX.Element {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Mary Agency",
+    "alternateName": "Mary Business Graphic",
+    "url": "https://marybusinessgraphic.com",
+    "logo": "https://marybusinessgraphic.com/logo.png",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+33-6-58-77-33-30",
+      "contactType": "customer service",
+      "availableLanguage": ["French", "English"]
+    },
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "231 Rue Saint-Honoré",
+      "addressLocality": "Paris",
+      "postalCode": "75001",
+      "addressCountry": "FR"
+    },
+    "sameAs": [
+      "https://www.instagram.com/maryagency",
+      "https://www.linkedin.com/company/maryagency"
+    ]
+  }
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+    />
+  )
+}
+```
+
+### 2. Semantic HTML Requirements
+
+**Every component MUST use semantic HTML:**
+
+```typescript
+// ❌ NEVER DO THIS
+<div className="header">
+  <div className="nav">
+    <div className="logo">Mary</div>
+    <div className="menu">...</div>
+  </div>
+</div>
+
+// ✅ ALWAYS DO THIS
+<header role="banner">
+  <nav role="navigation" aria-label="Main navigation">
+    <div className="logo">
+      <Link href="/" aria-label="Mary Agency - Home">Mary</Link>
+    </div>
+    <ul role="menubar">...</ul>
+  </nav>
+</header>
+```
+
+**Required semantic elements:**
+- `<header>` for site/section headers
+- `<nav>` for navigation menus
+- `<main>` for main content area
+- `<section>` for distinct sections
+- `<article>` for standalone content
+- `<aside>` for sidebar content
+- `<footer>` for site/section footers
+- `<h1>` through `<h6>` in hierarchical order
+
+### 3. Image Optimization Rules
+
+```typescript
+// Every image MUST be optimized
+import Image from 'next/image'
+
+// ✅ PROPER IMAGE IMPLEMENTATION
+<Image
+  src="/hero-image.jpg"
+  alt="Mary Agency creative team working on authentic digital experiences"
+  width={1920}
+  height={1080}
+  priority={isAboveFold}
+  placeholder="blur"
+  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgo..."
+  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+  quality={85}
+  loading={isAboveFold ? 'eager' : 'lazy'}
+/>
+```
+
+**Image Requirements:**
+- WebP format with JPEG fallback
+- Responsive sizing with `sizes` attribute
+- Descriptive `alt` text (not just filename)
+- Blur-up placeholder for smooth loading
+- `priority` for above-the-fold images
+- Proper `width` and `height` to prevent CLS
+
+### 4. URL Structure & Navigation SEO
+
+```typescript
+// URL structure MUST be clean and descriptive
+// ✅ GOOD URLs
+/agence
+/projets
+/projets/branding-luxury-hotel
+/contact
+
+// ❌ BAD URLs
+/page1
+/p?id=123
+/project.php?type=branding&id=456
+```
+
+**Navigation SEO Rules:**
+- Breadcrumb navigation on all pages
+- XML sitemap auto-generation
+- Clean URL structure
+- Proper internal linking
+- Canonical URLs to prevent duplicates
+
+### 5. Performance SEO Requirements
+
+```typescript
+// Core Web Vitals optimization
+export const webVitalsConfig = {
+  // Largest Contentful Paint: < 2.5s
+  LCP: {
+    target: 2500,
+    optimizations: [
+      'Preload hero images',
+      'Optimize font loading',
+      'Critical CSS inlining'
+    ]
+  },
+  // First Input Delay: < 100ms
+  FID: {
+    target: 100,
+    optimizations: [
+      'Code splitting',
+      'Reduce JavaScript execution time',
+      'Use passive event listeners'
+    ]
+  },
+  // Cumulative Layout Shift: < 0.1
+  CLS: {
+    target: 0.1,
+    optimizations: [
+      'Set image dimensions',
+      'Reserve space for ads/embeds',
+      'Avoid inserting content above existing content'
+    ]
+  }
+}
+```
+
+### 6. Content SEO Rules
+
+**Heading Hierarchy:**
+```typescript
+// ✅ PROPER HEADING STRUCTURE
+<h1>Mary Agency - Authentic Digital Experiences</h1>
+  <h2>Our Services</h2>
+    <h3>Digital Creation</h3>
+    <h3>Film Production</h3>
+  <h2>Our Portfolio</h2>
+    <h3>Luxury Branding Projects</h3>
+
+// ❌ NEVER SKIP HEADING LEVELS
+<h1>Main Title</h1>
+<h4>Subtitle</h4> // Missing h2, h3
+```
+
+**Content Requirements:**
+- One `<h1>` per page
+- Descriptive, keyword-rich headings
+- Alt text for all images
+- Internal linking with descriptive anchor text
+- Content length: minimum 300 words per page
+- Keyword density: 1-2% (natural integration)
+
+### 7. Technical SEO Implementation
+
+```typescript
+// robots.txt generation
+// app/robots.txt/route.ts
+export function GET(): Response {
+  return new Response(
+    `User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Sitemap: https://marybusinessgraphic.com/sitemap.xml`,
+    {
+      headers: {
+        'Content-Type': 'text/plain',
+      },
+    }
+  )
+}
+
+// Sitemap generation
+// app/sitemap.ts
+export default function sitemap(): MetadataRoute.Sitemap {
+  return [
+    {
+      url: 'https://marybusinessgraphic.com',
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 1,
+    },
+    {
+      url: 'https://marybusinessgraphic.com/agence',
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://marybusinessgraphic.com/projets',
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    }
+  ]
+}
+```
+
+### 8. Local SEO Requirements (Paris Agency)
+
+```typescript
+// Local business structured data
+const localBusinessData = {
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "name": "Mary Agency",
+  "image": "https://marybusinessgraphic.com/mary-agency-paris.jpg",
+  "telephone": "+33-6-58-77-33-30",
+  "email": "contact@marybusinessgraphic.com",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "231 Rue Saint-Honoré",
+    "addressLocality": "Paris",
+    "addressRegion": "Île-de-France",
+    "postalCode": "75001",
+    "addressCountry": "FR"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": "48.8651",
+    "longitude": "2.3297"
+  },
+  "openingHoursSpecification": {
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    "opens": "09:00",
+    "closes": "18:00"
+  },
+  "serviceArea": {
+    "@type": "GeoCircle",
+    "geoMidpoint": {
+      "@type": "GeoCoordinates",
+      "latitude": "48.8566",
+      "longitude": "2.3522"
+    },
+    "geoRadius": "50000"
+  }
+}
+```
+
+### 9. Accessibility SEO Integration
+
+```typescript
+// Accessibility directly impacts SEO
+export interface IAccessibleComponentProps {
+  // ARIA attributes
+  ariaLabel?: string
+  ariaDescribedBy?: string
+  ariaLabelledBy?: string
+  role?: string
+  
+  // Keyboard navigation
+  tabIndex?: number
+  onKeyDown?: (event: React.KeyboardEvent) => void
+  
+  // Screen reader support
+  srOnly?: string // Screen reader only text
+}
+
+// Example implementation
+<button
+  aria-label="Open navigation menu"
+  aria-expanded={isMenuOpen}
+  aria-controls="main-navigation"
+  onClick={toggleMenu}
+  onKeyDown={handleKeyDown}
+>
+  <span className="sr-only">Menu</span>
+  <HamburgerIcon />
+</button>
+```
+
+### 10. SEO Monitoring & Testing
+
+```typescript
+// Required SEO testing checklist for every component:
+const seoChecklist = [
+  'Valid HTML5 markup',
+  'Proper heading hierarchy',
+  'Alt text for all images',
+  'ARIA labels where needed',
+  'Keyboard navigation',
+  'Color contrast ratio > 4.5:1',
+  'Mobile-friendly design',
+  'Fast loading times (<3s)',
+  'No console errors',
+  'Structured data validation'
+]
+
+// Use these tools for validation:
+// - Google Lighthouse
+// - Google Search Console
+// - Wave Web Accessibility Evaluator
+// - HTML5 Validator
+// - Schema.org Validator
 ```
 
 ## Remember
@@ -463,6 +998,10 @@ docs(readme): update setup instructions for Docker
 4. **Mobile-first responsive** - Design for small screens first
 5. **Accessibility matters** - ARIA labels, keyboard navigation
 6. **Performance is UX** - Lazy load, optimize, measure
+7. **SEO is built-in** - Every component follows SEO best practices
+8. **Content is king** - Semantic HTML and descriptive text always
+9. **Local SEO matters** - Optimize for Paris and French market
+10. **Test everything** - Use tools to validate SEO implementation
 
 # Mary Agency - Complete Site Structure Analysis & Implementation Guide
 
